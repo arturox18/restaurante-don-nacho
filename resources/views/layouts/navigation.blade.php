@@ -11,23 +11,47 @@
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 
                 <div class="hidden space-x-8 sm:-my-px sm:flex sm:items-center me-8">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Inicio') }}
-                    </x-nav-link>
+                    
+                    {{-- ================================================= --}}
+                    {{-- MENÚ PARA ADMINISTRADOR (Rol ID 1) --}}
+                    {{-- ================================================= --}}
+                    @if(Auth::user()->rol_id === 1)
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Inicio') }}
+                        </x-nav-link>
 
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('usuarios')">
-                        {{ __('Usuarios') }}
-                    </x-nav-link>
+                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
+                            {{ __('Usuarios') }}
+                        </x-nav-link>
 
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('register-users')">
-                        {{ __('Registrar usuarios') }}
-                    </x-nav-link>
+                        <x-nav-link :href="route('users.create')" :active="request()->routeIs('users.create')">
+                            {{ __('Registrar') }}
+                        </x-nav-link>
 
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('menu')">
-                        {{ __('Administrar menú') }}
-                    </x-nav-link>
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('menu')">
+                            {{ __('Menú') }}
+                        </x-nav-link>
+                    @endif
+
+                    {{-- ================================================= --}}
+                    {{-- MENÚ PARA MESERO (Rol ID 2) --}}
+                    {{-- ================================================= --}}
+                    @if(Auth::user()->rol_id === 2)
+                        <x-nav-link :href="route('mesero.dashboard')" :active="request()->routeIs('mesero.dashboard')">
+                            {{ __('Mesas') }}
+                        </x-nav-link>
+                    @endif
+
+                    {{-- ================================================= --}}
+                    {{-- MENÚ PARA COCINERO (Rol ID 3) --}}
+                    {{-- ================================================= --}}
+                    @if(Auth::user()->rol_id === 3)
+                        <x-nav-link :href="route('cocinero.dashboard')" :active="request()->routeIs('cocinero.dashboard')">
+                            {{ __('Cocina') }}
+                        </x-nav-link>
+                    @endif
+
                 </div>
-
                 <button
                     x-data="{
                         darkMode: localStorage.getItem('theme') === 'dark',
@@ -64,7 +88,7 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
+                        <x-dropdown-link :href="route('profile.show')">
                             {{ __('Perfil') }}
                         </x-dropdown-link>
                         <form method="POST" action="{{ route('logout') }}">
@@ -91,19 +115,31 @@
     </div>
 
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+        
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Inicio') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('usuarios')">
-                {{ __('Usuarios') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('register-users')">
-                {{ __('Registrar usuarios') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('menu')">
-                {{ __('Administrar menú') }}
-            </x-responsive-nav-link>
+            @if(Auth::user()->rol_id === 1)
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    {{ __('Inicio') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
+                    {{ __('Usuarios') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('users.create')" :active="request()->routeIs('users.create')">
+                    {{ __('Registrar') }}
+                </x-responsive-nav-link>
+            @endif
+
+            @if(Auth::user()->rol_id === 2)
+                <x-responsive-nav-link :href="route('mesero.dashboard')" :active="request()->routeIs('mesero.dashboard')">
+                    {{ __('Mesas') }}
+                </x-responsive-nav-link>
+            @endif
+
+            @if(Auth::user()->rol_id === 3)
+                <x-responsive-nav-link :href="route('cocinero.dashboard')" :active="request()->routeIs('cocinero.dashboard')">
+                    {{ __('Cocina') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
@@ -113,9 +149,35 @@
             </div>
 
             <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
+                
+                <button
+                    x-data="{
+                        darkMode: localStorage.getItem('theme') === 'dark',
+                        toggle() {
+                            this.darkMode = !this.darkMode;
+                            localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
+                            if (this.darkMode) {
+                                document.documentElement.classList.add('dark');
+                            } else {
+                                document.documentElement.classList.remove('dark');
+                            }
+                        }
+                    }"
+                    x-init="$watch('darkMode', val => val ? document.documentElement.classList.add('dark') : document.documentElement.classList.remove('dark'));
+                            if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');"
+                    @click="toggle()"
+                    class="flex w-full items-center ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition duration-150 ease-in-out"
+                >
+                    <svg x-show="!darkMode" class="w-5 h-5 me-2" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    <svg x-show="darkMode" class="w-5 h-5 me-2" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                    
+                    {{ __('Cambiar tema') }}
+                </button>
+
+                <x-responsive-nav-link :href="route('profile.show')">
                     {{ __('Perfil') }}
                 </x-responsive-nav-link>
+
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <x-responsive-nav-link :href="route('logout')"
