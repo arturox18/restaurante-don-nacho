@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\MenuController;
 
 #Route::get('/', function () {
 #    return view('welcome');
@@ -65,5 +66,14 @@ Route::patch('/usuarios/{user}/status', [UserController::class, 'toggleStatus'])
 Route::patch('/usuarios/{user}/status', [UserController::class, 'toggleStatus'])
     ->middleware(['auth', 'verified'])
     ->name('users.toggleStatus');
+
+    // Rutas del Menú
+Route::get('/menu', [MenuController::class, 'index'])->name('menu.index');
+Route::get('/menu/{producto}/editar', [MenuController::class, 'edit'])->name('menu.edit');
+Route::put('/menu/{producto}', [MenuController::class, 'update'])->name('menu.update');
+Route::patch('/menu/{producto}/status', [MenuController::class, 'toggleStatus'])->name('menu.toggleStatus');
+
+Route::get('/menu/crear', [MenuController::class, 'create'])->name('menu.create');
+Route::post('/menu', [MenuController::class, 'store'])->name('menu.store');
 
 require __DIR__.'/auth.php';

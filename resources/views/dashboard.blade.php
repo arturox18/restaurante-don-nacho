@@ -28,7 +28,7 @@
                     <span class="text-xl font-bold text-gray-800 dark:text-white">Registrar usuarios</span>
                 </a>
 
-                <a href="#" class="group flex flex-col items-center justify-center w-64 h-64 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-3xl shadow-sm hover:shadow-xl hover:border-black dark:hover:border-white transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+                <a href="{{ route('menu.index') }}" class="group flex flex-col items-center justify-center w-64 h-64 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-3xl shadow-sm hover:shadow-xl hover:border-black dark:hover:border-white transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
                     <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-full mb-4 group-hover:bg-gray-100 dark:group-hover:bg-gray-600 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-gray-800 dark:text-white">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />

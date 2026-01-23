@@ -28,7 +28,7 @@
                             {{ __('Registrar') }}
                         </x-nav-link>
 
-                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('menu')">
+                        <x-nav-link :href="route('menu.index')" :active="request()->routeIs('menu')">
                             {{ __('Menú') }}
                         </x-nav-link>
                     @endif

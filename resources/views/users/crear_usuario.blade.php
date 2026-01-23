@@ -1,13 +1,15 @@
 <x-app-layout>
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-lg mx-auto sm:px-6 lg:px-8">
+            
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                    Registrar nuevo empleado
-                </h2>
+                
             </div>
 
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <h2 class="text-3xl font-semibold text-gray-800 dark:text-gray-200 p-6 text-center">
+                    Registrar nuevo empleado
+                </h2>
                 <div class="p-6 text-gray-900 dark:text-gray-100">
 
                     <form method="POST" action="{{ route('users.store') }}">
@@ -52,9 +54,12 @@
                                             name="password_confirmation" required />
                         </div>
 
-                        <div class="flex items-center justify-end mt-4">
-                            <x-primary-button class="ms-4">
-                                {{ __('Registrar Usuario') }}
+                        <div class="flex items-center justify-center mt-4">
+                            <button type="button" onclick="window.location='{{ route('users.index') }}'" class="mr-4 px-4 py-2 bg-red-800 dark:bg-red-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-red-800 uppercase tracking-widest hover:bg-red-700 dark:hover:bg-white transition ease-in-out duration-150">
+                                Cancelar
+                            </button>
+
+                            <x-primary-button class="justify-center"> {{ __('Registrar Usuario') }}
                             </x-primary-button>
                         </div>
                     </form>
