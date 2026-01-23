@@ -1,14 +1,12 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-center text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Editar perfil') }}
-        </h2>
-    </x-slot>
 
     <div class="py-12 flex justify-center">
         <div class="w-full max-w-lg bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden p-8">
             
             <form method="post" action="{{ route('profile.update') }}" class="space-y-6" enctype="multipart/form-data">
+                <h2 class="font-semibold text-3xl text-center text-gray-800 dark:text-gray-200 leading-tight">
+                    {{ __('Editar perfil') }}
+                </h2>
                 @csrf
                 @method('patch')
 
@@ -50,7 +48,7 @@
                     <x-input-label for="password" :value="__('Nueva contraseña')" />
                     <x-text-input id="password" name="password" type="password" class="mt-1 block w-full rounded-lg border-gray-300" autocomplete="new-password" />
                     <x-input-error class="mt-2" :messages="$errors->get('password')" />
-                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Dejar en blanco si no deseas cambiar la contraseña.</p>
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Si no quieres cambiar la contraseña, déjalo en blanco.</p>
                 </div>
 
                 <div class="flex items-center justify-between gap-4 mt-8 pt-4">

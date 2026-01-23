@@ -11,14 +11,28 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    public function index()
-    {
-        // Traemos usuarios Y roles (para el select)
-        $users = User::with('rol')->get();
-        $roles = Role::all(); 
-        
-        return view('users.index', compact('users', 'roles'));
+    public function index(Request $request)
+{
+    $search = $request->input('search');
+
+    $users = User::with('rol')
+        ->when($search, function ($query, $search) {
+            return $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhereHas('rol', function ($qRol) use ($search) {
+                      $qRol->where('nombre', 'like', "%{$search}%");
+                  });
+            });
+        })
+        ->get();
+
+    $roles = Role::all();
+    if ($request->ajax()) {
+        return view('users.partials.table-rows', compact('users', 'roles'))->render();
     }
+    return view('users.index', compact('users', 'roles'));
+}
 
     public function create()
     {

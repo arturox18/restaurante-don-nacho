@@ -1,14 +1,11 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-center text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Mi perfil') }}
-        </h2>
-    </x-slot>
 
     <div class="py-12 flex justify-center">
         <div class="w-full max-w-md bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden">
-            
-            <div class="bg-gray-50 dark:bg-gray-700 p-8 flex flex-col items-center border-b border-gray-100 dark:border-gray-600">
+            <h2 class="font-semibold text-3xl text-center text-gray-800 dark:text-gray-200 leading-tight p-4">
+            {{ __('Mi perfil') }}
+            </h2>
+            <div class="p-8 flex flex-col items-center">
                 <div class="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center border-4 border-white dark:border-gray-500 shadow-md overflow-hidden mb-4">
                     @if(Auth::user()->profile_photo)
                         <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Foto de perfil" class="w-full h-full object-cover">
@@ -52,7 +49,7 @@
                 </div>
 
                 <div class="pt-4">
-                    <a href="{{ route('profile.edit') }}" class="block w-full text-center px-4 py-3 bg-gray-900 dark:bg-white border border-transparent rounded-lg font-semibold text-sm text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-200 transition ease-in-out duration-150 shadow-lg">
+                    <a href="{{ route('profile.edit') }}" class="block text-center px-4 py-3 bg-gray-900 dark:bg-white border border-transparent rounded-lg font-semibold text-sm text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-200 transition ease-in-out duration-150 shadow-lg">
                         Editar Información
                     </a>
                 </div>
