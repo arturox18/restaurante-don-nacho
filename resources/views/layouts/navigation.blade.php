@@ -3,7 +3,12 @@
         <div class="flex justify-between h-20">
             
             <div class="shrink-0 flex items-center">
-                <a href="{{ route('dashboard') }}">
+                {{-- LÓGICA DEL LOGO: Redirige según el rol --}}
+                <a href="{{ 
+                    Auth::user()->rol_id === 2 ? route('mesero.dashboard') : 
+                    (Auth::user()->rol_id === 3 ? route('cocinero.dashboard') : 
+                    route('dashboard')) 
+                }}">
                     <x-application-logo class="block h-16 w-auto object-contain fill-current text-gray-800 dark:text-gray-200" />
                 </a>
             </div>
@@ -26,6 +31,10 @@
 
                         <x-nav-link :href="route('users.create')" :active="request()->routeIs('users.create')">
                             {{ __('Registrar') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('mesas.index')" :active="request()->routeIs('mesas.index')">
+                            {{ __('Mesas') }}
                         </x-nav-link>
 
                         <x-nav-link :href="route('menu.index')" :active="request()->routeIs('menu')">
@@ -182,7 +191,7 @@
                     @csrf
                     <x-responsive-nav-link :href="route('logout')"
                             onclick="event.preventDefault();
-                                        this.closest('form').submit();">
+                                    this.closest('form').submit();">
                         {{ __('Cerrar sesión') }}
                     </x-responsive-nav-link>
                 </form>
