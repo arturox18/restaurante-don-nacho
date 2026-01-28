@@ -34,43 +34,67 @@ class MeseroController extends Controller
         $productos = $categoria->productos()->where('is_active', true)->get();
         return view('mesero.platillos', compact('mesa', 'categoria', 'productos'));
     }
+    
     public function detalle(Mesa $mesa, Producto $producto)
-    {
-        return view('mesero.detalle', compact('mesa', 'producto'));
-    }
+{
+    // Cargamos el producto con sus grupos y las opciones de esos grupos
+    $producto->load(['gruposOpciones.opciones']);
+    
+    return view('mesero.detalle', compact('mesa', 'producto'));
+}
 
-    // Guarda el platillo en la BD
     public function agregar(Request $request, Mesa $mesa, Producto $producto)
     {
-        // 1. Buscar orden 'pendiente'
         $orden = \App\Models\Orden::firstOrCreate(
-            [
-                'mesa_id' => $mesa->id,
-                'estatus' => 'pendiente'
-            ],
-            [
-                'usuario_id' => \Illuminate\Support\Facades\Auth::id(),
-                'total' => 0
-            ]
+            ['mesa_id' => $mesa->id, 'estatus' => 'pendiente'],
+            ['usuario_id' => Auth::id(), 'total' => 0]
         );
 
-        // 2. Juntar Extras y Comentarios en un solo texto 'notas'
-        $extras = $request->input('extras', []);
-        $comentario = $request->input('comentarios');
+        $textoOpciones = [];
+        $costoExtraTotal = 0;
 
-        $notasFinales = implode(', ', $extras);
-        if ($comentario) {
-            $notasFinales .= ". Nota: " . $comentario;
+        // 1. Sumar Opciones Dinámicas (Checkboxes/Radios)
+        if ($request->has('opciones')) {
+            foreach ($request->opciones as $grupoId => $valor) {
+                if (is_array($valor)) {
+                    $opcionesElegidas = \App\Models\Opcion::whereIn('id', $valor)->get();
+                    foreach ($opcionesElegidas as $op) {
+                        $textoOpciones[] = $op->nombre;
+                        $costoExtraTotal += $op->precio_extra;
+                    }
+                } else {
+                    $opcionElegida = \App\Models\Opcion::find($valor);
+                    if ($opcionElegida) {
+                        $textoOpciones[] = $opcionElegida->nombre;
+                        $costoExtraTotal += $opcionElegida->precio_extra;
+                    }
+                }
+            }
         }
 
-        // 3. Crear el detalle (usando tus nombres de columna: precio_unitario, notas)
+        // 2. NUEVO: Sumar Costo Extra Manual
+        $costoManual = $request->input('costo_manual', 0);
+        if ($costoManual > 0) {
+            $costoExtraTotal += $costoManual;
+            $textoOpciones[] = "Extra manual ($" . number_format($costoManual, 2) . ")";
+        }
+
+        // Notas
+        $notaFinal = implode(', ', $textoOpciones);
+        if ($request->notas) {
+            $notaFinal .= ($notaFinal ? ". " : "") . "Nota: " . $request->notas;
+        }
+
+        // 3. Precio Final Unitario
+        $precioFinal = $producto->precio + $costoExtraTotal;
+
         \App\Models\DetalleOrden::create([
             'orden_id' => $orden->id,
             'producto_id' => $producto->id,
             'cantidad' => $request->cantidad,
-            'precio_unitario' => $producto->precio,
-            'notas' => $notasFinales,
-            'costo_extra' => 0
+            'precio_unitario' => $precioFinal,
+            'notas' => $notaFinal,
+            'costo_extra' => $costoExtraTotal
         ]);
 
         return redirect()->route('mesero.carrito', $mesa);

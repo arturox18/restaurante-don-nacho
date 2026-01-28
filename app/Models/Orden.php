@@ -8,14 +8,7 @@ class Orden extends Model
 {
     protected $table = 'ordenes';
 
-    protected $fillable = [
-        'usuario_id', 
-        'mesa_id', 
-        'total', 
-        'cargo_extra', 
-        'motivo_extra', 
-        'estatus'
-    ];
+    protected $guarded = []; 
 
     public function mesa()
     {
@@ -24,7 +17,7 @@ class Orden extends Model
 
     public function usuario()
     {
-        return $this->belongsTo(User::class, 'usuario_id'); 
+        return $this->belongsTo(User::class, 'usuario_id');
     }
 
     public function detalles()
