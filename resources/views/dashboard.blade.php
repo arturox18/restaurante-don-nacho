@@ -27,6 +27,15 @@
                     </div>
                     <span class="text-xl font-bold text-gray-800 dark:text-white">Registrar usuarios</span>
                 </a>
+                
+                <a href="{{ route('mesas.index') }}" class="group flex flex-col items-center justify-center w-64 h-64 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-3xl shadow-sm hover:shadow-xl hover:border-black dark:hover:border-white transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-full mb-4 group-hover:bg-gray-100 dark:group-hover:bg-gray-600 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-gray-800 dark:text-white">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold text-gray-800 dark:text-white">Administrar mesas</span>
+                </a>
 
                 <a href="{{ route('menu.index') }}" class="group flex flex-col items-center justify-center w-64 h-64 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-3xl shadow-sm hover:shadow-xl hover:border-black dark:hover:border-white transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
                     <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-full mb-4 group-hover:bg-gray-100 dark:group-hover:bg-gray-600 transition">
