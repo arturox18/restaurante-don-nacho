@@ -56,6 +56,10 @@
                         <x-nav-link :href="route('mesero.ordenes')" :active="request()->routeIs('mesero.ordenes')">
                             {{ __('Mis Órdenes') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('mesero.historial')" :active="request()->routeIs('mesero.historial')">
+                            {{ __('Historial') }}
+                        </x-nav-link>
                     @endif
 
                     {{-- ================================================= --}}
@@ -169,6 +173,10 @@
 
                 <x-responsive-nav-link :href="route('mesero.ordenes')" :active="request()->routeIs('mesero.ordenes')">
                     {{ __('Mis Órdenes') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('mesero.historial')" :active="request()->routeIs('mesero.historial')">
+                    {{ __('Historial') }}
                 </x-responsive-nav-link>
             @endif
 

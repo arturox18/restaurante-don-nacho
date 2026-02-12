@@ -100,16 +100,47 @@ class MeseroController extends Controller
         return redirect()->route('mesero.carrito', $mesa);
     }
 
-    // PANTALLA 3: Carrito
     public function carrito(Mesa $mesa)
     {
-        // Buscamos la orden que esté 'pendiente'
-        $orden = Orden::where('mesa_id', $mesa->id)
-            ->where('estatus', 'pendiente')
+        // CORRECCIÓN: Ahora buscamos órdenes pendientes, cocinando o listas
+        // Antes solo buscaba 'pendiente' y por eso desaparecía al mandar a cocina
+        $orden = \App\Models\Orden::where('mesa_id', $mesa->id)
+            ->whereIn('estatus', ['pendiente', 'cocinando', 'listo']) 
             ->with('detalles.producto')
+            ->latest() // Por si hubiera varias, toma la última
             ->first();
 
         return view('mesero.carrito', compact('mesa', 'orden'));
+    }
+
+    public function historial(Request $request)
+    {
+        // Traemos las órdenes pagadas del mesero logueado
+        // ¡OJO! Agregamos 'with' para cargar los detalles y productos
+        $query = \App\Models\Orden::where('usuario_id', \Illuminate\Support\Facades\Auth::id())
+            ->where('estatus', 'pagado')
+            ->with(['mesa', 'detalles.producto']) 
+            ->orderBy('created_at', 'desc');
+
+        // --- FILTROS (Igual que antes) ---
+        if ($request->filled('fecha')) {
+            $query->whereDate('created_at', $request->fecha);
+        }
+        
+        if ($request->filled('mes')) {
+            $anio = date('Y', strtotime($request->mes));
+            $mesNumero = date('m', strtotime($request->mes));
+            $query->whereYear('created_at', $anio)->whereMonth('created_at', $mesNumero);
+        }
+
+        if ($request->filled('anio')) {
+            $query->whereYear('created_at', $request->anio);
+        }
+
+        $ordenes = $query->paginate(10)->withQueryString();
+
+        // Ya no calculamos $totalVendido
+        return view('mesero.historial', compact('ordenes'));
     }
 
     // ACCIÓN: Mandar a Cocina
@@ -148,5 +179,23 @@ class MeseroController extends Controller
             ->get();
 
         return view('mesero.mis-ordenes', compact('ordenes'));
+    }
+
+    public function ticket(Mesa $mesa)
+    {
+        // Buscamos la orden activa (pendiente, cocinando o listo)
+        $orden = \App\Models\Orden::where('mesa_id', $mesa->id)
+            ->whereIn('estatus', ['pendiente', 'cocinando', 'listo'])
+            ->latest()
+            ->firstOrFail();
+
+        // 1. Cambiamos el estatus de la orden a PAGADO (para que salga del historial activo)
+        $orden->update(['estatus' => 'pagado']);
+
+        // 2. IMPORTANTE: Liberamos la mesa automáticamente
+        $mesa->update(['estado' => 'disponible']);
+
+        // 3. Retornamos la vista del ticket (que se imprime sola)
+        return view('mesero.ticket', compact('orden', 'mesa'));
     }
 }

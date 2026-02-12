@@ -51,6 +51,8 @@ Route::get('/mesero', [App\Http\Controllers\MeseroController::class, 'index'])
 Route::get('/mesero/mis-ordenes', [MeseroController::class, 'misOrdenes'])->name('mesero.ordenes');
 // Ruta para ver el historial de órdenes del mesero
 Route::get('/mesero/mis-ordenes', [App\Http\Controllers\MeseroController::class, 'misOrdenes'])->name('mesero.ordenes');
+Route::get('/mesas/{mesa}/ticket', [App\Http\Controllers\MeseroController::class, 'ticket'])->name('mesero.ticket');
+Route::get('/mesero/historial', [App\Http\Controllers\MeseroController::class, 'historial'])->name('mesero.historial');
 
 // --- RUTA DEL COCINERO ---
 Route::get('/cocina', function () {
