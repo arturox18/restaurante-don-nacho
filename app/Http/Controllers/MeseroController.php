@@ -136,4 +136,17 @@ class MeseroController extends Controller
 
         return redirect()->route('mesero.dashboard')->with('success', 'Orden enviada a cocina');
     }
+
+    public function misOrdenes()
+    {
+        // Buscamos órdenes creadas por ESTE usuario (Auth::id())
+        // Y que no estén canceladas (opcional, tú decides qué estatus mostrar)
+        $ordenes = \App\Models\Orden::where('usuario_id', \Illuminate\Support\Facades\Auth::id())
+            ->whereIn('estatus', ['pendiente', 'cocinando', 'listo']) // Solo activas
+            ->with(['mesa', 'detalles']) // Traemos datos para mostrar resumen
+            ->orderBy('created_at', 'desc') // Las más nuevas primero
+            ->get();
+
+        return view('mesero.mis-ordenes', compact('ordenes'));
+    }
 }

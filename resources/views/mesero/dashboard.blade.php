@@ -3,7 +3,7 @@
         <div class="max-w-md mx-auto sm:px-6 lg:px-8">
             
             <h2 class="text-2xl font-bold text-center text-gray-800 dark:text-gray-200 mb-6">
-                Bienvenido, {{ Auth::user()->name }}
+                Bienvenido {{ Auth::user()->name }}
             </h2>
 
             <div class="grid grid-cols-2 gap-4 px-4">
@@ -16,7 +16,6 @@
                             </svg>
                         </div>
                         <span class="font-bold text-gray-800 dark:text-gray-200 text-lg">{{ $mesa->nombre }}</span>
-                        
                         <span class="text-xs mt-1 {{ $mesa->estado == 'ocupada' ? 'text-red-500' : 'text-green-500' }}">
                             {{ ucfirst($mesa->estado) }}
                         </span>

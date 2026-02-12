@@ -56,7 +56,6 @@
                 <div class="mb-8">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Costo Extra Manual ($)</label>
                     <input type="number" name="costo_manual" step="0.50" min="0" placeholder="0.00" class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg shadow-sm focus:ring-indigo-500 text-lg font-bold">
-                    <p class="text-xs text-gray-500 mt-1">Úsalo para cobrar extras no listados (ej. envases, ingredientes especiales)</p>
                 </div>
 
                 <div class="flex gap-4 pb-8">
