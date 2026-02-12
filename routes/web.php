@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\CocineroController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MesaController;
 use App\Http\Controllers\MeseroController;
+use App\Http\Controllers\CategoriaController;
 
 #Route::get('/', function () {
 #    return view('welcome');
@@ -46,6 +48,10 @@ Route::get('/mesero', [App\Http\Controllers\MeseroController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('mesero.dashboard');
 
+Route::get('/mesero/mis-ordenes', [MeseroController::class, 'misOrdenes'])->name('mesero.ordenes');
+// Ruta para ver el historial de órdenes del mesero
+Route::get('/mesero/mis-ordenes', [App\Http\Controllers\MeseroController::class, 'misOrdenes'])->name('mesero.ordenes');
+
 // --- RUTA DEL COCINERO ---
 Route::get('/cocina', function () {
     return view('cocinero.dashboard');
@@ -78,6 +84,7 @@ Route::patch('/menu/{producto}/status', [MenuController::class, 'toggleStatus'])
 
 Route::get('/menu/crear', [MenuController::class, 'create'])->name('menu.create');
 Route::post('/menu', [MenuController::class, 'store'])->name('menu.store');
+Route::delete('/menu/{producto}', [MenuController::class, 'destroy'])->name('menu.destroy');
 
 // Rutas del Mesero
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -94,5 +101,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::get('/admin/mesas', [MesaController::class, 'index'])->name('mesas.index');
 Route::post('/admin/mesas', [MesaController::class, 'store'])->name('mesas.store');
 Route::delete('/admin/mesas/{mesa}', [MesaController::class, 'destroy'])->name('mesas.destroy');
+
+// Rutas de Cocina
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/cocina', [CocineroController::class, 'index'])->name('cocinero.dashboard');
+    Route::patch('/cocina/{orden}/terminar', [CocineroController::class, 'terminarOrden'])->name('cocinero.terminar');
+});
+
+Route::get('/categorias/crear', [CategoriaController::class, 'create'])->name('categorias.create');
+Route::post('/categorias', [CategoriaController::class, 'store'])->name('categorias.store');
 
 require __DIR__ . '/auth.php';

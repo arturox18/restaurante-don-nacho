@@ -8,14 +8,9 @@ class DetalleOrden extends Model
 {
     protected $table = 'detalles_orden';
 
-    protected $fillable = [
-        'orden_id',
-        'producto_id',
-        'cantidad',
-        'precio_unitario',
-        'costo_extra',
-        'notas'            
-    ];
+    // --- DESPROTECCIÓN TOTAL ---
+    protected $guarded = [];
+    // ---------------------------
 
     public function orden()
     {

@@ -97,4 +97,16 @@ class MenuController extends Controller
 
         return redirect()->route('menu.index')->with('success', 'Platillo creado correctamente.');
     }
+
+    public function destroy(Producto $producto)
+    {
+        // Opcional: Borrar la imagen del storage si existe
+        if ($producto->imagen && \Illuminate\Support\Facades\Storage::disk('public')->exists($producto->imagen)) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($producto->imagen);
+        }
+
+        $producto->delete();
+
+        return redirect()->route('menu.index')->with('success', 'Platillo eliminado correctamente.');
+    }
 }

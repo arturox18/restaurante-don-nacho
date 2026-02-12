@@ -19,4 +19,9 @@ public function categoria()
     {
         return $this->belongsTo(Categoria::class);
     }
+
+public function gruposOpciones()
+{
+    return $this->belongsToMany(GrupoOpcion::class, 'producto_grupo_opcion');
+}
 }
