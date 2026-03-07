@@ -22,7 +22,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     
                     @foreach($ordenes as $orden)
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border-l-8 border-indigo-500 overflow-hidden flex flex-col order-card" data-timestamp="{{ $orden->updated_at->timestamp }}">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border-l-8 border-blue-500 overflow-hidden flex flex-col order-card" data-timestamp="{{ $orden->updated_at->timestamp }}">
                         
                         <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 flex justify-between items-center border-b border-gray-100 dark:border-gray-600">
                             <div>
@@ -59,17 +59,23 @@
                                 @endforeach
                             </ul>
                         </div>
+                        <div class="p-4 bg-gray-50 dark:bg-gray-700/50 mt-auto flex gap-3">
+                            
+                            <a href="{{ route('cocinero.ticket', $orden) }}" target="_blank" 
+                               class="w-1/4 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 font-bold py-3 rounded-lg shadow-sm transition transform active:scale-95 flex items-center justify-center" title="Imprimir Comanda">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                </svg>
+                            </a>
 
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700/50 mt-auto">
-                            <form action="{{ route('cocinero.terminar', $orden) }}" method="POST">
+                            <form action="{{ route('cocinero.terminar', $orden) }}" method="POST" class="w-3/4">
                                 @csrf
                                 @method('PATCH')
-                                <button type="submit" class="w-full bg-gray-800 hover:bg-gray-900 dark:bg-white dark:text-gray-900 text-white font-bold py-3 rounded-lg shadow transition transform active:scale-95 text-lg">
+                                <button type="submit" class="w-full bg-gray-800 hover:bg-gray-900 dark:bg-white dark:text-gray-900 text-white font-bold py-3 rounded-lg shadow-md transition transform active:scale-95 text-lg">
                                     Finalizar Orden
                                 </button>
                             </form>
                         </div>
-
                     </div>
                     @endforeach
 
@@ -94,15 +100,15 @@
                     // Actualizar texto
                     card.querySelector('.timer').textContent = `${minutes}:${seconds}`;
 
-                    // Cambiar color por urgencia
-                    // Si lleva más de 15 minutos (900 seg), pon el borde ROJO
-                    if (diff > 900) {
-                        card.classList.remove('border-indigo-500', 'border-yellow-400');
+                    // NUEVA LÓGICA DE TIEMPOS
+                    // Si lleva más de 30 minutos (1800 seg), pon el borde ROJO
+                    if (diff >= 1800) {
+                        card.classList.remove('border-blue-500', 'border-yellow-400');
                         card.classList.add('border-red-600');
                     } 
-                    // Si lleva más de 8 minutos (480 seg), pon el borde AMARILLO
-                    else if (diff > 480) {
-                        card.classList.remove('border-indigo-500');
+                    // Si lleva más de 15 minutos (900 seg), pon el borde AMARILLO
+                    else if (diff >= 900) {
+                        card.classList.remove('border-blue-500');
                         card.classList.add('border-yellow-400');
                     }
                 });
