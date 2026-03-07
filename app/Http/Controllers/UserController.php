@@ -60,11 +60,9 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Usuario creado correctamente.');
     }
 
-    // --- NUEVAS FUNCIONES ---
 
     public function updateRole(Request $request, User $user)
     {
-        // Evitar que uno mismo se quite el rol de admin y se bloquee
         if ($user->id === Auth::id()) {
             return back()->with('error', 'No puedes cambiar tu propio rol.');
         }
@@ -82,7 +80,6 @@ class UserController extends Controller
         return back()->with('error', 'No puedes desactivar tu propia cuenta.');
     }
 
-    // Cambia de true a false, o de false a true
     $user->update(['is_active' => !$user->is_active]);
 
     return back()->with('success', 'El estado del usuario ha sido actualizado.');

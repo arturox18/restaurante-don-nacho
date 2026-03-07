@@ -43,6 +43,10 @@
                         <x-nav-link :href="route('menu.index')" :active="request()->routeIs('menu')">
                             {{ __('Menú') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('historial')" :active="request()->routeIs('historial')">
+                            {{ __('Historial') }}
+                        </x-nav-link>
                     @endif
 
                     {{-- ================================================= --}}
@@ -68,6 +72,10 @@
                     @if (Auth::user()->rol_id === 3)
                         <x-nav-link :href="route('cocinero.dashboard')" :active="request()->routeIs('cocinero.dashboard')">
                             {{ __('Cocina') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('cocinero.historial')" :active="request()->routeIs('cocinero.historial')">
+                            {{ __('Historial') }}
                         </x-nav-link>
                     @endif
 
@@ -164,6 +172,10 @@
                 <x-responsive-nav-link :href="route('menu.index')" :active="request()->routeIs('menu')">
                     {{ __('Menú') }}
                 </x-responsive-nav-link>
+                
+                <x-responsive-nav-link :href="route('historial')" :active="request()->routeIs('historial')">
+                    {{ __('Historial') }}
+                </x-responsive-nav-link>
             @endif
 
             @if (Auth::user()->rol_id === 2)
@@ -183,6 +195,10 @@
             @if (Auth::user()->rol_id === 3)
                 <x-responsive-nav-link :href="route('cocinero.dashboard')" :active="request()->routeIs('cocinero.dashboard')">
                     {{ __('Cocina') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('cocinero.historial')" :active="request()->routeIs('cocinero.historial')">
+                    {{ __('Historial') }}
                 </x-responsive-nav-link>
             @endif
         </div>

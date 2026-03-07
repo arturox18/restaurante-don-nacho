@@ -20,24 +20,19 @@ class MeseroController extends Controller
 
     public function catalogo(Mesa $mesa)
     {
-        // Guardamos la mesa en sesión para recordarla
-        session(['mesa_activa' => $mesa->id]);
-
-        $categorias = Categoria::all();
-        return view('mesero.categorias', compact('mesa', 'categorias'));
+        $categorias = \App\Models\Categoria::all(); 
+        $productos = \App\Models\Producto::all(); 
+        return view('mesero.categorias', compact('mesa', 'categorias', 'productos'));
     }
 
-    // Pantalla 3: Ver platillos de una categoría
     public function platillos(Mesa $mesa, Categoria $categoria)
     {
-        // Cargamos los productos activos de esa categoría
         $productos = $categoria->productos()->where('is_active', true)->get();
         return view('mesero.platillos', compact('mesa', 'categoria', 'productos'));
     }
     
     public function detalle(Mesa $mesa, Producto $producto)
 {
-    // Cargamos el producto con sus grupos y las opciones de esos grupos
     $producto->load(['gruposOpciones.opciones']);
     
     return view('mesero.detalle', compact('mesa', 'producto'));
@@ -53,7 +48,6 @@ class MeseroController extends Controller
         $textoOpciones = [];
         $costoExtraTotal = 0;
 
-        // 1. Sumar Opciones Dinámicas (Checkboxes/Radios)
         if ($request->has('opciones')) {
             foreach ($request->opciones as $grupoId => $valor) {
                 if (is_array($valor)) {
@@ -72,20 +66,17 @@ class MeseroController extends Controller
             }
         }
 
-        // 2. NUEVO: Sumar Costo Extra Manual
         $costoManual = $request->input('costo_manual', 0);
         if ($costoManual > 0) {
             $costoExtraTotal += $costoManual;
             $textoOpciones[] = "Extra manual ($" . number_format($costoManual, 2) . ")";
         }
 
-        // Notas
         $notaFinal = implode(', ', $textoOpciones);
         if ($request->notas) {
             $notaFinal .= ($notaFinal ? ". " : "") . "Nota: " . $request->notas;
         }
 
-        // 3. Precio Final Unitario
         $precioFinal = $producto->precio + $costoExtraTotal;
 
         \App\Models\DetalleOrden::create([
@@ -102,8 +93,6 @@ class MeseroController extends Controller
 
     public function carrito(Mesa $mesa)
     {
-        // CORRECCIÓN: Ahora buscamos órdenes pendientes, cocinando o listas
-        // Antes solo buscaba 'pendiente' y por eso desaparecía al mandar a cocina
         $orden = \App\Models\Orden::where('mesa_id', $mesa->id)
             ->whereIn('estatus', ['pendiente', 'cocinando', 'listo']) 
             ->with('detalles.producto')
@@ -115,14 +104,11 @@ class MeseroController extends Controller
 
     public function historial(Request $request)
     {
-        // Traemos las órdenes pagadas del mesero logueado
-        // ¡OJO! Agregamos 'with' para cargar los detalles y productos
         $query = \App\Models\Orden::where('usuario_id', \Illuminate\Support\Facades\Auth::id())
             ->where('estatus', 'pagado')
             ->with(['mesa', 'detalles.producto']) 
             ->orderBy('created_at', 'desc');
 
-        // --- FILTROS (Igual que antes) ---
         if ($request->filled('fecha')) {
             $query->whereDate('created_at', $request->fecha);
         }
@@ -139,11 +125,9 @@ class MeseroController extends Controller
 
         $ordenes = $query->paginate(10)->withQueryString();
 
-        // Ya no calculamos $totalVendido
         return view('mesero.historial', compact('ordenes'));
     }
 
-    // ACCIÓN: Mandar a Cocina
     public function confirmarOrden(Mesa $mesa)
     {
         $orden = Orden::where('mesa_id', $mesa->id)
@@ -151,12 +135,10 @@ class MeseroController extends Controller
             ->first();
 
         if ($orden) {
-            // Calculamos el total sumando los detalles
             $total = $orden->detalles->sum(function ($detalle) {
                 return $detalle->cantidad * $detalle->precio_unitario;
             });
 
-            // Actualizamos estatus a 'cocinando' y guardamos el total
             $orden->update([
                 'estatus' => 'cocinando',
                 'total' => $total
@@ -170,12 +152,10 @@ class MeseroController extends Controller
 
     public function misOrdenes()
     {
-        // Buscamos órdenes creadas por ESTE usuario (Auth::id())
-        // Y que no estén canceladas (opcional, tú decides qué estatus mostrar)
         $ordenes = \App\Models\Orden::where('usuario_id', \Illuminate\Support\Facades\Auth::id())
-            ->whereIn('estatus', ['pendiente', 'cocinando', 'listo']) // Solo activas
-            ->with(['mesa', 'detalles']) // Traemos datos para mostrar resumen
-            ->orderBy('created_at', 'desc') // Las más nuevas primero
+            ->whereIn('estatus', ['pendiente', 'cocinando', 'listo'])
+            ->with(['mesa', 'detalles'])
+            ->orderBy('created_at', 'desc')
             ->get();
 
         return view('mesero.mis-ordenes', compact('ordenes'));
@@ -183,19 +163,12 @@ class MeseroController extends Controller
 
     public function ticket(Mesa $mesa)
     {
-        // Buscamos la orden activa (pendiente, cocinando o listo)
         $orden = \App\Models\Orden::where('mesa_id', $mesa->id)
             ->whereIn('estatus', ['pendiente', 'cocinando', 'listo'])
             ->latest()
             ->firstOrFail();
-
-        // 1. Cambiamos el estatus de la orden a PAGADO (para que salga del historial activo)
         $orden->update(['estatus' => 'pagado']);
-
-        // 2. IMPORTANTE: Liberamos la mesa automáticamente
         $mesa->update(['estado' => 'disponible']);
-
-        // 3. Retornamos la vista del ticket (que se imprime sola)
         return view('mesero.ticket', compact('orden', 'mesa'));
     }
 }
