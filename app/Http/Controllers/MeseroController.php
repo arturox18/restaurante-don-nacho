@@ -21,7 +21,10 @@ class MeseroController extends Controller
     public function catalogo(Mesa $mesa)
     {
         $categorias = \App\Models\Categoria::all(); 
-        $productos = \App\Models\Producto::all(); 
+        
+        // CORRECCIÓN: Quitamos el where('status', 1) y ponemos esto:
+        $productos = \App\Models\Producto::with('categoria')->get(); 
+        
         return view('mesero.categorias', compact('mesa', 'categorias', 'productos'));
     }
 
@@ -32,18 +35,27 @@ class MeseroController extends Controller
     }
     
     public function detalle(Mesa $mesa, Producto $producto)
-{
-    $producto->load(['gruposOpciones.opciones']);
-    
-    return view('mesero.detalle', compact('mesa', 'producto'));
-}
+    {
+        $producto->load(['gruposOpciones.opciones']);
+        return view('mesero.detalle', compact('mesa', 'producto'));
+    }
 
     public function agregar(Request $request, Mesa $mesa, Producto $producto)
     {
-        $orden = \App\Models\Orden::firstOrCreate(
-            ['mesa_id' => $mesa->id, 'estatus' => 'pendiente'],
-            ['usuario_id' => Auth::id(), 'total' => 0]
-        );
+        // 1. Buscamos cualquier orden VIVA de la mesa (que no esté pagada)
+        $orden = \App\Models\Orden::where('mesa_id', $mesa->id)
+            ->where('estatus', '!=', 'pagado')
+            ->first();
+
+        // 2. SOLO creamos una nueva si de verdad no hay ninguna activa
+        if (!$orden) {
+            $orden = \App\Models\Orden::create([
+                'mesa_id' => $mesa->id,
+                'usuario_id' => Auth::id(),
+                'estatus' => 'pendiente', // <--- CORRECCIÓN: Usamos 'pendiente' en lugar de 'vacio'
+                'total' => 0
+            ]);
+        }
 
         $textoOpciones = [];
         $costoExtraTotal = 0;
@@ -79,6 +91,7 @@ class MeseroController extends Controller
 
         $precioFinal = $producto->precio + $costoExtraTotal;
 
+        // 3. Agregamos el detalle siempre a la misma orden
         \App\Models\DetalleOrden::create([
             'orden_id' => $orden->id,
             'producto_id' => $producto->id,
@@ -88,15 +101,21 @@ class MeseroController extends Controller
             'costo_extra' => $costoExtraTotal
         ]);
 
+        // 4. Actualizamos el total de la orden sumando todo lo que tiene hasta ahora
+        $orden->total = \App\Models\DetalleOrden::where('orden_id', $orden->id)->get()->sum(function($d) {
+            return $d->precio_unitario * $d->cantidad;
+        });
+        $orden->save();
+
         return redirect()->route('mesero.carrito', $mesa);
     }
 
     public function carrito(Mesa $mesa)
     {
+        // Modificado para traer la orden sin importar su estatus mientras no esté pagada
         $orden = \App\Models\Orden::where('mesa_id', $mesa->id)
-            ->whereIn('estatus', ['pendiente', 'cocinando', 'listo']) 
+            ->where('estatus', '!=', 'pagado')
             ->with('detalles.producto')
-            ->latest() // Por si hubiera varias, toma la última
             ->first();
 
         return view('mesero.carrito', compact('mesa', 'orden'));
@@ -128,26 +147,38 @@ class MeseroController extends Controller
         return view('mesero.historial', compact('ordenes'));
     }
 
-    public function confirmarOrden(Mesa $mesa)
+    // Fíjate cómo agregamos Request $request aquí para leer los botones
+    public function confirmarOrden(Request $request, Mesa $mesa)
     {
         $orden = Orden::where('mesa_id', $mesa->id)
-            ->where('estatus', 'pendiente')
+            ->where('estatus', '!=', 'pagado')
             ->first();
 
         if ($orden) {
+            // Recalculamos el total por seguridad
             $total = $orden->detalles->sum(function ($detalle) {
                 return $detalle->cantidad * $detalle->precio_unitario;
             });
 
-            $orden->update([
-                'estatus' => 'cocinando',
-                'total' => $total
-            ]);
+            // AQUÍ ESTÁ LA LÓGICA DE LOS BOTONES
+            if ($request->accion == 'cuenta') {
+                // Si solo son bebidas y la orden estaba vacía, la pasamos a listo de una vez
+                if ($orden->estatus == 'vacio' || $orden->estatus == 'pendiente') {
+                    $orden->estatus = 'listo';
+                }
+                // Si la orden ya estaba en cocinando, no tocamos el estatus
+            } else {
+                // Si le dio al botón de "Mandar a cocina", la regresamos a cocinando para que la vean
+                $orden->estatus = 'cocinando';
+            }
+
+            $orden->total = $total;
+            $orden->save();
 
             $mesa->update(['estado' => 'ocupada']);
         }
 
-        return redirect()->route('mesero.dashboard')->with('success', 'Orden enviada a cocina');
+        return redirect()->route('mesero.dashboard')->with('success', 'Orden actualizada correctamente');
     }
 
     public function misOrdenes()

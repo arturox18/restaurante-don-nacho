@@ -66,7 +66,6 @@
             const btnLimpiar = document.getElementById('btn-limpiar');
             const gridCategorias = document.getElementById('grid-categorias');
 
-            // Recibimos los platillos con sus categorías desde Laravel
             const productos = @json($productos);
             const mesaId = {{ $mesa->id }};
 
@@ -95,10 +94,8 @@
                     listaResultados.innerHTML = `<li class="p-4 text-center text-gray-500 text-sm">No se encontraron platillos.</li>`;
                 } else {
                     resultados.forEach(producto => {
-                        // Construimos la URL directo al detalle del platillo
                         const url = `/mesas/${mesaId}/platillo/${producto.id}`;
                         
-                        // Obtenemos el nombre de la categoría (si no tiene, ponemos 'General')
                         const nombreCategoria = producto.categoria ? producto.categoria.nombre : 'General';
                         
                         const li = document.createElement('li');
