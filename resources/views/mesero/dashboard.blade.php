@@ -8,7 +8,7 @@
 
             <div class="grid grid-cols-2 gap-4 px-4">
                 @foreach($mesas as $mesa)
-                <a href="{{ route('mesero.catalogo', $mesa) }}" class="group">
+                <a href="{{ $mesa->estado == 'ocupada' ? route('mesero.carrito', $mesa) : route('mesero.catalogo', $mesa) }}" class="group">
                     <div class="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 flex flex-col items-center justify-center shadow-sm hover:border-indigo-500 hover:shadow-md transition duration-200 h-40">
                         <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center mb-3 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900">
                             <svg class="w-8 h-8 text-gray-500 group-hover:text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">

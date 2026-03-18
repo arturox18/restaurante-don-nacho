@@ -10,15 +10,21 @@ class CocineroController extends Controller
     public function index()
     {
         $ordenes = Orden::where('estatus', 'cocinando')
-                        ->with(['mesa', 'usuario', 'detalles.producto'])
-                        ->orderBy('updated_at', 'asc')
-                        ->get();
+            ->with(['mesa', 'usuario', 'detalles' => function($query) {
+                $query->whereIn('estado', ['pendiente', 'en_cocina'])->with('producto');
+            }])
+            ->orderBy('updated_at', 'asc')
+            ->get();
 
         return view('cocinero.dashboard', compact('ordenes'));
     }
 
     public function terminarOrden(Orden $orden)
     {
+        // 1. MAGIA: Marcamos todos los platillos que estaban pendientes o cocinándose como 'listos'
+        $orden->detalles()->whereIn('estado', ['pendiente', 'en_cocina'])->update(['estado' => 'listo']);
+        
+        // 2. Marcamos la orden completa como lista
         $orden->update(['estatus' => 'listo']);
         
         return back()->with('success', 'Orden marcada como lista.');
@@ -53,6 +59,13 @@ class CocineroController extends Controller
     {
         $orden->load(['mesa', 'usuario', 'detalles.producto']);
         
-        return view('cocinero.ticket', compact('orden'));
+        // 1. Rescatamos SOLAMENTE los platillos nuevos que no se han impreso (pendientes)
+        $detallesNuevos = $orden->detalles()->where('estado', 'pendiente')->get();
+
+        // 2. Inmediatamente los marcamos como 'en_cocina' para que no vuelvan a salir en el futuro
+        $orden->detalles()->where('estado', 'pendiente')->update(['estado' => 'en_cocina']);
+        
+        // 3. Mandamos SOLO esos platillos nuevos a la vista del ticket
+        return view('cocinero.ticket', compact('orden', 'detallesNuevos'));
     }
 }

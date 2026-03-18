@@ -20,10 +20,8 @@ class MeseroController extends Controller
 
     public function catalogo(Mesa $mesa)
     {
-        $categorias = \App\Models\Categoria::all(); 
-        
-        // CORRECCIÓN: Quitamos el where('status', 1) y ponemos esto:
-        $productos = \App\Models\Producto::with('categoria')->get(); 
+        $categorias = \App\Models\Categoria::all();
+        $productos = \App\Models\Producto::where('is_active', true)->with('categoria')->get(); 
         
         return view('mesero.categorias', compact('mesa', 'categorias', 'productos'));
     }
@@ -177,8 +175,7 @@ class MeseroController extends Controller
 
             $mesa->update(['estado' => 'ocupada']);
         }
-
-        return redirect()->route('mesero.dashboard')->with('success', 'Orden actualizada correctamente');
+        return redirect()->route('mesero.catalogo', $mesa)->with('success', 'Orden procesada correctamente');
     }
 
     public function misOrdenes()

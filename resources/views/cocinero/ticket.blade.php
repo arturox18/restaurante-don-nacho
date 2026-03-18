@@ -101,23 +101,29 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($orden->detalles as $detalle)
-            <tr>
-                <td class="txt-cantidad" style="vertical-align: top; font-weight: bold; padding-top: 8px; text-align: center;">
-                    {{ $detalle->cantidad }}
-                </td>
-                
-                <td style="padding-top: 8px; padding-bottom: 8px;">
-                    <span class="txt-platillo" style="font-weight: bold;">
-                        {{ mb_strtoupper($detalle->producto->nombre) }}
-                    </span>
-                    
-                    @if($detalle->notas)
-                        <div class="nota">** {{ mb_strtoupper($detalle->notas) }} **</div>
-                    @endif
-                </td>
-            </tr>
-            @endforeach
+            @if($detallesNuevos->isEmpty())
+                <tr>
+                    <td colspan="2" style="text-align: center; padding: 15px 0; font-size: 13px; font-weight: bold;">
+                        No hay platillos nuevos por preparar.
+                    </td>
+                </tr>
+            @else
+                @foreach($detallesNuevos as $detalle)
+                <tr>
+                    <td class="txt-cantidad" style="vertical-align: top; font-weight: bold; padding-top: 8px;">
+                        {{ $detalle->cantidad }}
+                    </td>
+                    <td style="padding-top: 8px; padding-bottom: 8px;">
+                        <span class="txt-platillo" style="font-weight: bold;">
+                            {{ mb_strtoupper($detalle->producto->nombre) }}
+                        </span>
+                        @if($detalle->notas)
+                            <div class="nota">** {{ mb_strtoupper($detalle->notas) }} **</div>
+                        @endif
+                    </td>
+                </tr>
+                @endforeach
+            @endif
         </tbody>
     </table>
 
