@@ -60,7 +60,7 @@
 
                 <div class="flex gap-4 pb-8">
                     <a href="{{ url()->previous() }}" class="w-1/3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-4 rounded-xl text-center transition">Volver</a>
-                    <button type="submit" class="w-2/3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl text-center shadow-lg transition transform active:scale-95">Agregar Orden</button>
+                    <button type="submit" class="w-2/3 bg-gray-900 hover:bg-gray-600 text-white font-bold py-4 rounded-xl text-center shadow-lg transition transform active:scale-95">Agregar Orden</button>
                 </div>
             </form>
         </div>

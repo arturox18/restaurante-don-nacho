@@ -4,7 +4,6 @@
         <div class="flex justify-between h-20">
 
             <div class="shrink-0 flex items-center">
-                {{-- LÓGICA DEL LOGO: Redirige según el rol --}}
                 <a
                     href="{{ Auth::user()->rol_id === 2
                         ? route('mesero.dashboard')
@@ -19,10 +18,6 @@
             <div class="hidden sm:flex sm:items-center sm:ms-6">
 
                 <div class="hidden space-x-8 sm:-my-px sm:flex sm:items-center me-8">
-
-                    {{-- ================================================= --}}
-                    {{-- MENÚ PARA ADMINISTRADOR (Rol ID 1) --}}
-                    {{-- ================================================= --}}
                     @if (Auth::user()->rol_id === 1)
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                             {{ __('Inicio') }}
@@ -49,9 +44,6 @@
                         </x-nav-link>
                     @endif
 
-                    {{-- ================================================= --}}
-                    {{-- MENÚ PARA MESERO (Rol ID 2) --}}
-                    {{-- ================================================= --}}
                     @if (Auth::user()->rol_id === 2)
                         <x-nav-link :href="route('mesero.dashboard')" :active="request()->routeIs('mesero.dashboard')">
                             {{ __('Mesas') }}
@@ -66,9 +58,6 @@
                         </x-nav-link>
                     @endif
 
-                    {{-- ================================================= --}}
-                    {{-- MENÚ PARA COCINERO (Rol ID 3) --}}
-                    {{-- ================================================= --}}
                     @if (Auth::user()->rol_id === 3)
                         <x-nav-link :href="route('cocinero.dashboard')" :active="request()->routeIs('cocinero.dashboard')">
                             {{ __('Cocina') }}
