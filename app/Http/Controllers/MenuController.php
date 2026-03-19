@@ -12,7 +12,6 @@ class MenuController extends Controller
     {
         $search = $request->input('search');
 
-        // Traemos las categorías que tengan productos que coincidan con la búsqueda
         $categorias = Categoria::whereHas('productos', function ($query) use ($search) {
                 if ($search) {
                     $query->where('nombre', 'like', "%{$search}%");
@@ -33,7 +32,6 @@ class MenuController extends Controller
         return view('menu.index', compact('categorias'));
     }
 
-    // Pantalla para editar un producto
     public function edit(Producto $producto)
     {
         $categorias = Categoria::all();
@@ -41,26 +39,32 @@ class MenuController extends Controller
     }
 
     public function update(Request $request, Producto $producto)
-{
-    $request->validate([
-        'nombre' => 'required|string|max:255',
-        'precio' => 'required|numeric',
-        'categoria_id' => 'required|exists:categorias,id',
-        'descripcion' => 'nullable|string',
-        'imagen' => 'nullable|image|max:2048',
-    ]);
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'precio' => 'required|numeric',
+            'categoria_id' => 'required|exists:categorias,id',
+            'descripcion' => 'nullable|string',
+            'imagen' => 'nullable|image|max:2048',
+        ]);
 
-    $data = $request->except('imagen');
+        $data = $request->except('imagen');
 
-    if ($request->hasFile('imagen')) {
-        $path = $request->file('imagen')->store('productos', 'public');
-        $data['imagen'] = $path;
+        if ($request->hasFile('imagen')) {
+            $imagen = $request->file('imagen');
+            $nombreImagen = time() . '_' . $imagen->getClientOriginalName();
+            
+            // Movemos físicamente a la vitrina pública
+            $imagen->move(public_path('storage/productos'), $nombreImagen);
+            
+            // Guardamos la ruta en la base de datos
+            $data['imagen'] = 'productos/' . $nombreImagen;
+        }
+
+        $producto->update($data);
+
+        return redirect()->route('menu.index')->with('success', 'Producto actualizado.');
     }
-
-    $producto->update($data);
-
-    return redirect()->route('menu.index')->with('success', 'Producto actualizado.');
-}
 
     public function toggleStatus(Producto $producto)
     {
@@ -74,7 +78,6 @@ class MenuController extends Controller
         return view('menu.create', compact('categorias'));
     }
 
-    // 2. Guardar el nuevo platillo
     public function store(Request $request)
     {
         $request->validate([
@@ -87,12 +90,15 @@ class MenuController extends Controller
 
         $data = $request->except('imagen');
 
-        // Procesar imagen si la subieron
         if ($request->hasFile('imagen')) {
-            $data['imagen'] = $request->file('imagen')->store('productos', 'public');
+            $imagen = $request->file('imagen');
+            $nombreImagen = time() . '_' . $imagen->getClientOriginalName();
+            
+            $imagen->move(public_path('storage/productos'), $nombreImagen);
+            $data['imagen'] = 'productos/' . $nombreImagen;
         }
 
-        // Crear producto (nace activo por defecto según la migración)
+        // Crear producto
         Producto::create($data);
 
         return redirect()->route('menu.index')->with('success', 'Platillo creado correctamente.');
@@ -100,9 +106,8 @@ class MenuController extends Controller
 
     public function destroy(Producto $producto)
     {
-        // Opcional: Borrar la imagen del storage si existe
-        if ($producto->imagen && \Illuminate\Support\Facades\Storage::disk('public')->exists($producto->imagen)) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($producto->imagen);
+        if ($producto->imagen && file_exists(public_path('storage/' . $producto->imagen))) {
+            unlink(public_path('storage/' . $producto->imagen));
         }
 
         $producto->delete();

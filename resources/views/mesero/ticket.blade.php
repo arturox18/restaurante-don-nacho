@@ -17,10 +17,12 @@
             padding: 10px;
         }
         .text-center { text-align: center; }
+        .text-right { text-align: right; }
         .bold { font-weight: bold; }
         .line { border-bottom: 1px dashed #000; margin: 10px 0; }
         .flex { display: flex; justify-content: space-between; align-items: center; }
         .mb-2 { margin-bottom: 5px; }
+        .mt-1 { margin-top: 2px; }
 
         /* --- MAGIA PARA LA TABLA --- */
         table { 
@@ -112,9 +114,28 @@
 
     <div class="line"></div>
 
-    <div class="flex bold" style="font-size: 16px; margin: 15px 0;">
+    @php
+        $totalFinal = $orden->total;
+        $subtotal = $totalFinal / 1.16;
+        $iva = $totalFinal - $subtotal;
+    @endphp
+
+    <div style="font-size: 12px; margin: 10px 0;">
+        <div class="flex mt-1 text-right">
+            <span>Subtotal:</span>
+            <span>${{ number_format($subtotal, 2) }}</span>
+        </div>
+        <div class="flex mt-1 text-right">
+            <span>IVA (16%):</span>
+            <span>${{ number_format($iva, 2) }}</span>
+        </div>
+    </div>
+
+    <div class="line"></div>
+
+    <div class="flex bold" style="font-size: 16px; margin: 10px 0;">
         <span>TOTAL:</span>
-        <span>${{ number_format($orden->total, 2) }}</span>
+        <span>${{ number_format($totalFinal, 2) }}</span>
     </div>
 
     <div class="line"></div>
